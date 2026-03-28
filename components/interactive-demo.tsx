@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { 
   Upload, 
   FileText, 
+  FileSearch,
   Loader2, 
   CheckCircle, 
   AlertTriangle, 
