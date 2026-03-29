@@ -66,7 +66,7 @@ export function HeroSection() {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="text-base px-8 border-border hover:bg-secondary">
+          <Button asChild variant="outline" size="lg" className="text-base px-8 border-border hover:bg-secondary hover:text-foreground">
             <Link href="/how-it-works#demo">
               <Zap className="mr-2 h-4 w-4 text-primary" />
               Try Interactive Demo
