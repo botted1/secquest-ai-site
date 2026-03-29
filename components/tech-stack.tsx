@@ -59,7 +59,7 @@ export function TechStack() {
             Tech Stack
           </h2>
           <p className="text-3xl sm:text-4xl font-bold text-foreground">
-            Modern <span className="text-primary">technologies</span>
+            We <span className="text-primary">use</span>
           </p>
         </motion.div>
 

@@ -2,9 +2,8 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { ArrowRight, Sparkles, Zap } from "lucide-react"
+import { ArrowRight, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 
 export function HeroSection() {
   return (
@@ -14,18 +13,6 @@ export function HeroSection() {
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
       
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24 text-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Badge variant="outline" className="mb-6 px-4 py-1.5 border-primary/30 bg-primary/5 text-primary">
-            <Sparkles className="w-3.5 h-3.5 mr-2" />
-            AWS Hackathon 2026 - Track 4.2
-          </Badge>
-        </motion.div>
-
         {/* Main headline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
