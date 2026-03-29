@@ -21,7 +21,7 @@ const problems = [
     icon: TrendingDown,
     stat: "Weeks",
     title: "Delayed Deals",
-    description: "Slow questionnaire responses block sales cycles and cost companies millions in delayed revenue.",
+    description: "Slow questionnaire responses block sales cycles and cost companies crores in delayed revenue.",
   },
 ]
 
