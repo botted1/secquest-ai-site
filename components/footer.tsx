@@ -20,16 +20,9 @@ export function Footer() {
             <span className="text-lg font-bold text-foreground">SecQuest AI</span>
           </div>
 
-          {/* Links */}
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <span>AWS Hackathon 2026 - Track 4.2</span>
-            <span className="hidden sm:inline">•</span>
-            <span className="hidden sm:inline">Presented by [Your Team Name]</span>
-          </div>
-
-          {/* Copyright */}
+          {/* Team */}
           <div className="text-sm text-muted-foreground">
-            Built with Amazon Bedrock
+            Presented by <span className="text-primary font-medium">Velocity7</span>
           </div>
         </div>
       </div>
