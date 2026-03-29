@@ -9,8 +9,8 @@ export default function HomePage() {
   return (
     <main className="relative min-h-screen bg-background">
       <ScrollBackground />
+      <Navbar />
       <div className="relative z-10">
-        <Navbar />
         <HeroSection />
         <ProblemSection />
         <SolutionTeaser />
