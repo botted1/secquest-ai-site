@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.6.0"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --test --experimental-strip-types --no-warnings tests/**/*.test.ts"
+    "test": "node --test --experimental-strip-types --no-warnings 'tests/**/*.test.ts'"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-agent-runtime": "^3.1021.0",
