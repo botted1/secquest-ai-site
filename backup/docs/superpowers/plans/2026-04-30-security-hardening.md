@@ -913,7 +913,7 @@ export async function POST(req: NextRequest) {
   const guard = await requireAuth()
   if (!guard.ok) return guard.response
 
-  const userId = guard.session.user!.id
+  const userId = guard.session.user.id
   const limit = rateLimit(`extract:${userId}`, { capacity: 10, refillPerSec: 1 / 60 })
   if (!limit.ok) {
     audit({ action: "rate_limit.hit", userId, meta: { route: "extract" } })
@@ -1084,7 +1084,7 @@ export async function POST(req: NextRequest) {
   const guard = await requireAuth()
   if (!guard.ok) return guard.response
 
-  const userId = guard.session.user!.id
+  const userId = guard.session.user.id
   const limit = rateLimit(`knowledge:${userId}`, { capacity: 10, refillPerSec: 1 / 60 })
   if (!limit.ok) {
     audit({ action: "rate_limit.hit", userId, meta: { route: "knowledge" } })
@@ -1194,7 +1194,7 @@ export async function POST(req: NextRequest) {
   const guard = await requireAuth()
   if (!guard.ok) return guard.response
 
-  const userId = guard.session.user!.id
+  const userId = guard.session.user.id
   const limit = rateLimit(`upload:${userId}`, { capacity: 10, refillPerSec: 1 / 60 })
   if (!limit.ok) {
     audit({ action: "rate_limit.hit", userId, meta: { route: "upload" } })
@@ -1316,7 +1316,7 @@ export async function POST(req: NextRequest) {
   const guard = await requireAuth()
   if (!guard.ok) return guard.response
 
-  const userId = guard.session.user!.id
+  const userId = guard.session.user.id
   // Heavier endpoint — embeddings + LLM loop. 5 calls capacity, refill one every 2 min.
   const limit = rateLimit(`analyze:${userId}`, { capacity: 5, refillPerSec: 1 / 120 })
   if (!limit.ok) {
