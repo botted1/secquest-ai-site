@@ -1,12 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import os from 'os'
-import OpenAI from "openai"
-
-const openai = new OpenAI({
-  baseURL: "https://integrate.api.nvidia.com/v1",
-  apiKey: "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",
-})
+import { aiClient } from "./ai-client"
 
 interface VectorNode {
   id: string
@@ -20,7 +15,7 @@ const VECTOR_STORE_FILE = path.join(os.tmpdir(), 'secquest-vectors.json')
  * Generate an embedding for a piece of text using NVIDIA NIM.
  */
 export async function generateEmbedding(text: string, isQuery = false): Promise<number[]> {
-  const response = await openai.embeddings.create({
+  const response = await aiClient.embeddings.create({
     model: "nvidia/nv-embedqa-e5-v5",
     input: text,
     // @ts-expect-error - NVIDIA specific kwargs
