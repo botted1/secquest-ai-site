@@ -902,6 +902,7 @@ import { parseBody } from "@/lib/api/validate"
 import { audit } from "@/lib/api/audit-log"
 import { SafeFileKey, resolveSafePath } from "@/lib/api/file-key"
 
+export const runtime = "nodejs"
 export const maxDuration = 60
 
 const ExtractSchema = z.object({
@@ -976,6 +977,14 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error("Extract error:", error)
+    audit({
+      action: "extract.fail",
+      userId,
+      meta: {
+        fileName: body.data.fileName,
+        errorClass: error instanceof Error ? error.constructor.name : typeof error,
+      },
+    })
     return NextResponse.json(
       { error: "Failed to extract questions from document" },
       { status: 500 }
@@ -1073,6 +1082,7 @@ import { audit } from "@/lib/api/audit-log"
 import { SafeFileKey, resolveSafePath } from "@/lib/api/file-key"
 import { injectPolicyDocument } from "@/lib/vector-store"
 
+export const runtime = "nodejs"
 export const maxDuration = 300
 
 const KnowledgeSchema = z.object({
@@ -1143,6 +1153,14 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error("Knowledge base processing error:", error)
+    audit({
+      action: "knowledge.fail",
+      userId,
+      meta: {
+        fileName: body.data.fileName,
+        errorClass: error instanceof Error ? error.constructor.name : typeof error,
+      },
+    })
     return NextResponse.json(
       { error: "Failed to process security policy. Ensure the file is not corrupted." },
       { status: 500 }
@@ -1189,6 +1207,8 @@ import { requireAuth } from "@/lib/api/require-auth"
 import { rateLimit } from "@/lib/api/rate-limit"
 import { audit } from "@/lib/api/audit-log"
 import { verifyFileType } from "@/lib/file-type-detect"
+
+export const runtime = "nodejs"
 
 export async function POST(req: NextRequest) {
   const guard = await requireAuth()
@@ -1306,6 +1326,7 @@ import { rateLimit } from "@/lib/api/rate-limit"
 import { parseBody } from "@/lib/api/validate"
 import { audit } from "@/lib/api/audit-log"
 
+export const runtime = "nodejs"
 export const maxDuration = 300
 
 const AnalyzeSchema = z.object({
@@ -1358,6 +1379,14 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error("Analyze error:", error)
+    audit({
+      action: "analyze.fail",
+      userId,
+      meta: {
+        questionCount: body.data.questions.length,
+        errorClass: error instanceof Error ? error.constructor.name : typeof error,
+      },
+    })
     return NextResponse.json(
       { error: "Failed to analyze questions. Please check your Bedrock configuration." },
       { status: 500 }
