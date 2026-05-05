@@ -6,6 +6,10 @@ export type AuditAction =
   | "auth.fail"
   | "rate_limit.hit"
   | "validation.fail"
+  | "upload.fail"
+  | "extract.fail"
+  | "analyze.fail"
+  | "knowledge.fail"
 
 export interface AuditEvent {
   action: AuditAction

@@ -83,6 +83,14 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error("Extract error:", error)
+    audit({
+      action: "extract.fail",
+      userId,
+      meta: {
+        fileName: body.data.fileName,
+        errorClass: error instanceof Error ? error.constructor.name : typeof error,
+      },
+    })
     return NextResponse.json(
       { error: "Failed to extract questions from document" },
       { status: 500 }
