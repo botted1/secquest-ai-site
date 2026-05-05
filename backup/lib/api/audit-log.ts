@@ -15,5 +15,15 @@ export interface AuditEvent {
 }
 
 export function audit(event: AuditEvent): void {
-  console.log(JSON.stringify({ ts: new Date().toISOString(), ...event }))
+  try {
+    console.log(JSON.stringify({ ts: new Date().toISOString(), ...event }))
+  } catch {
+    console.log(JSON.stringify({
+      ts: new Date().toISOString(),
+      action: event.action,
+      userId: event.userId,
+      ip: event.ip,
+      meta: { _serializationError: true },
+    }))
+  }
 }
