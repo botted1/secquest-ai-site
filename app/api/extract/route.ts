@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import fs from "node:fs/promises"
 import { z } from "zod"
 import { parseExcel, parseWord, extractQuestionsWithAI, getFileType } from "@/lib/document-parser"
 import { requireAuth } from "@/lib/api/require-auth"
 import { rateLimit } from "@/lib/api/rate-limit"
 import { parseBody } from "@/lib/api/validate"
 import { audit } from "@/lib/api/audit-log"
-import { SafeFileKey, resolveSafePath } from "@/lib/api/file-key"
+import { SafeFileKey, getFileBuffer } from "@/lib/api/file-key"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -39,8 +38,7 @@ export async function POST(req: NextRequest) {
   try {
     const fileType = getFileType(body.data.fileName)
     let rawText = ""
-    const filePath = resolveSafePath(body.data.fileKey)
-    const buffer = await fs.readFile(filePath)
+    const buffer = await getFileBuffer(body.data.fileKey)
 
     if (fileType === "pdf") {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import fs from "node:fs/promises"
 import path from "node:path"
 import os from "node:os"
+import { put } from "@vercel/blob"
 import { MAX_FILE_SIZE, getFileType } from "@/lib/document-parser"
 import { requireAuth } from "@/lib/api/require-auth"
 import { rateLimit } from "@/lib/api/rate-limit"
@@ -67,10 +68,18 @@ export async function POST(req: NextRequest) {
 
   const timestamp = Date.now()
   const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_")
-  const fileKey = `secquest_uploads/${timestamp}_${sanitizedName}`
-  const filePath = path.join(os.tmpdir(), fileKey)
-  await fs.mkdir(path.dirname(filePath), { recursive: true })
-  await fs.writeFile(filePath, buffer)
+  const pathname = `secquest_uploads/${timestamp}_${sanitizedName}`
+
+  let fileKey: string
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(pathname, buffer, { access: "public" })
+    fileKey = blob.url
+  } else {
+    const filePath = path.join(os.tmpdir(), pathname)
+    await fs.mkdir(path.dirname(filePath), { recursive: true })
+    await fs.writeFile(filePath, buffer)
+    fileKey = pathname
+  }
 
   audit({
     action: "upload",
