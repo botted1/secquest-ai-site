@@ -2,13 +2,15 @@
 
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LogOut, Shield, Database } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
+import { useSession, signOut } from "next-auth/react"
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { data: session } = useSession()
 
   return (
     <motion.nav 
@@ -106,11 +108,43 @@ export function Navbar() {
             >
               How It Works
             </Link>
-            <Button asChild size="sm" className="glow-cyan-sm">
-              <Link href="/how-it-works">
-                Try Demo
-              </Link>
-            </Button>
+            <Link 
+              href="/agent" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Agent
+            </Link>
+            <Link 
+              href="/knowledge" 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+            >
+              <Database className="w-3.5 h-3.5" />
+              Knowledge Base
+            </Link>
+
+            {session ? (
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">
+                  {session.user?.name}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="text-xs"
+                >
+                  <LogOut className="w-3.5 h-3.5 mr-1.5" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button asChild size="sm" className="glow-cyan-sm">
+                <Link href="/login">
+                  Sign In
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -145,11 +179,45 @@ export function Navbar() {
               >
                 How It Works
               </Link>
-              <Button asChild size="sm" className="w-fit glow-cyan-sm">
-                <Link href="/how-it-works">
-                  Try Demo
-                </Link>
-              </Button>
+              <Link 
+                href="/agent" 
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Shield className="w-3.5 h-3.5" />
+                Agent
+              </Link>
+              <Link 
+                href="/knowledge" 
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Database className="w-3.5 h-3.5" />
+                Knowledge Base
+              </Link>
+
+              {session ? (
+                <div className="flex flex-col gap-2 pt-2 border-t border-border/30">
+                  <span className="text-xs text-muted-foreground">
+                    Signed in as {session.user?.name}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="w-fit text-xs"
+                  >
+                    <LogOut className="w-3.5 h-3.5 mr-1.5" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button asChild size="sm" className="w-fit glow-cyan-sm">
+                  <Link href="/login">
+                    Sign In
+                  </Link>
+                </Button>
+              )}
             </div>
           </motion.div>
         )}
