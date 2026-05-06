@@ -1,10 +1,6 @@
 import { queryVectorStore } from "./vector-store"
-import OpenAI from "openai"
+import { aiClient } from "./ai-client"
 
-const openai = new OpenAI({
-  baseURL: "https://integrate.api.nvidia.com/v1",
-  apiKey: "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",
-})
 export interface QuestionResult {
   id: number
   question: string
@@ -81,7 +77,7 @@ The confidence_score should be:
 - 0.0-0.29 if no relevant context was found`
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await aiClient.chat.completions.create({
       model: "nvidia/nemotron-3-super-120b-a12b",
       messages: [{ role: "user", content: prompt }],
       temperature: 1,
