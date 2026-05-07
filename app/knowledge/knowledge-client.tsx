@@ -45,26 +45,12 @@ export function KnowledgeClient({ userName }: { userName: string }) {
     setStats(null)
 
     try {
-      // 1. Upload file locally
       const formData = new FormData()
       formData.append("file", file)
-      
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
-      
-      if (!uploadRes.ok) throw new Error((await uploadRes.json()).error || "Upload failed")
-      const uploadData = await uploadRes.json()
 
-      // 2. Parse and generate embeddings locally
       const embedRes = await fetch("/api/knowledge", {
         method: "POST",
-        headers: { "Content-Type" : "application/json" },
-        body: JSON.stringify({
-          fileKey: uploadData.fileKey,
-          fileName: file.name
-        })
+        body: formData,
       })
 
       if (!embedRes.ok) throw new Error((await embedRes.json()).error || "Embedding failed")

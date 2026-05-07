@@ -1,60 +1,49 @@
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
-import mammoth from "mammoth"
 import { getFileType } from "@/lib/document-parser"
-import { requireAuth } from "@/lib/api/require-auth"
-import { rateLimit } from "@/lib/api/rate-limit"
-import { parseBody } from "@/lib/api/validate"
-import { audit } from "@/lib/api/audit-log"
-import { SafeFileKey, getFileBuffer } from "@/lib/api/file-key"
+import mammoth from "mammoth"
 import { injectPolicyDocument } from "@/lib/vector-store"
 
-export const runtime = "nodejs"
-export const maxDuration = 300
+export const maxDuration = 60
 
-const KnowledgeSchema = z.object({
-  fileKey: SafeFileKey,
-  fileName: z.string().min(1).max(255),
-})
-
-export async function POST(req: NextRequest) {
-  const guard = await requireAuth()
-  if (!guard.ok) return guard.response
-
-  const userId = guard.session.user.id
-  const limit = rateLimit(`knowledge:${userId}`, { capacity: 10, refillPerSec: 1 / 60 })
-  if (!limit.ok) {
-    audit({ action: "rate_limit.hit", userId, meta: { route: "knowledge" } })
-    return NextResponse.json(
-      { error: "Rate limited" },
-      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
-    )
-  }
-
-  const body = await parseBody(req, KnowledgeSchema)
-  if (!body.ok) {
-    audit({ action: "validation.fail", userId, meta: { route: "knowledge" } })
-    return body.response
-  }
-
+export async function POST(request: NextRequest) {
   try {
-    const fileType = getFileType(body.data.fileName)
+    const formData = await request.formData()
+    const file = formData.get("file") as File | null
+
+    if (!file) {
+      return NextResponse.json(
+        { error: "No file provided" },
+        { status: 400 }
+      )
+    }
+
+    const fileType = getFileType(file.name)
+
+    if (fileType !== "pdf" && fileType !== "word") {
+      return NextResponse.json(
+        { error: "Unsupported file type. Please upload a PDF or Word document for policies." },
+        { status: 400 }
+      )
+    }
+
+    if (file.size > 25 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "File too large. Maximum size is 25MB." },
+        { status: 400 }
+      )
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer())
     let rawText = ""
-    const buffer = await getFileBuffer(body.data.fileKey)
 
     if (fileType === "pdf") {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const pdfParse = require("pdf-parse")
       const data = await pdfParse(buffer)
       rawText = data.text
-    } else if (fileType === "word") {
+    } else {
       const result = await mammoth.extractRawText({ buffer })
       rawText = result.value
-    } else {
-      return NextResponse.json(
-        { error: "Unsupported file type. Please upload a PDF or Word document for policies." },
-        { status: 400 }
-      )
     }
 
     if (!rawText.trim()) {
@@ -66,11 +55,6 @@ export async function POST(req: NextRequest) {
 
     const numChunks = await injectPolicyDocument(rawText)
 
-    audit({
-      action: "knowledge.ingest",
-      userId,
-      meta: { fileName: body.data.fileName, chunks: numChunks },
-    })
     return NextResponse.json({
       success: true,
       chunks: numChunks,
@@ -78,17 +62,10 @@ export async function POST(req: NextRequest) {
       message: `Successfully embedded ${numChunks} semantic chunks into local vector store.`,
     })
   } catch (error) {
-    console.error("Knowledge base processing error:", error)
-    audit({
-      action: "knowledge.fail",
-      userId,
-      meta: {
-        fileName: body.data.fileName,
-        errorClass: error instanceof Error ? error.constructor.name : typeof error,
-      },
-    })
+    const message = error instanceof Error ? error.message : String(error)
+    console.error("Knowledge base processing error:", message)
     return NextResponse.json(
-      { error: "Failed to process security policy. Ensure the file is not corrupted." },
+      { error: `Failed to process security policy: ${message}` },
       { status: 500 }
     )
   }

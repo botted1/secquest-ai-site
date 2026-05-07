@@ -1,6 +1,11 @@
 import * as XLSX from "xlsx"
 import mammoth from "mammoth"
-import { aiClient } from "./ai-client"
+import OpenAI from "openai"
+
+const openai = new OpenAI({
+  baseURL: "https://integrate.api.nvidia.com/v1",
+  apiKey: process.env.NVIDIA_API_KEY,
+})
 
 /**
  * Parse an Excel file (.xlsx / .xls) and extract all text content.
@@ -70,7 +75,7 @@ Return ONLY a valid JSON array of question strings, nothing else. Example:
 ["Does your organization have a documented information security policy?", "How do you handle encryption of data at rest?"]`
 
   try {
-    const completion = await aiClient.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "nvidia/nemotron-3-super-120b-a12b",
       messages: [{ role: "user", content: prompt }],
       temperature: 1,
