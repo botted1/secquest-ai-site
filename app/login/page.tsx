@@ -4,7 +4,7 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { Shield, Loader2, AlertCircle, Lock, User } from "lucide-react"
+import { Shield, Loader2, AlertCircle, Lock, User, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,6 +32,28 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Invalid credentials. Please try again.")
+      } else {
+        router.push("/agent")
+        router.refresh()
+      }
+    } catch {
+      setError("An error occurred. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGuestLogin = async () => {
+    setError("")
+    setLoading(true)
+    try {
+      const result = await signIn("credentials", {
+        username: "guest",
+        password: "guest",
+        redirect: false,
+      })
+      if (result?.error) {
+        setError("Guest login failed. Please try again.")
       } else {
         router.push("/agent")
         router.refresh()
@@ -183,6 +205,34 @@ export default function LoginPage() {
                 )}
               </Button>
             </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/30" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-3 bg-card/60 text-xs text-muted-foreground/60 uppercase tracking-wider">
+                  or
+                </span>
+              </div>
+            </div>
+
+            {/* Guest login */}
+            <Button
+              type="button"
+              variant="outline"
+              disabled={loading}
+              onClick={handleGuestLogin}
+              className="w-full h-11 border-border/50 bg-background/30 hover:bg-primary/5 hover:border-primary/30 text-muted-foreground hover:text-foreground transition-all text-sm font-medium"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Zap className="w-4 h-4 mr-2 text-amber-400" />
+              )}
+              Continue as Guest
+            </Button>
 
             {/* Security notice */}
             <div className="mt-6 pt-5 border-t border-border/30">

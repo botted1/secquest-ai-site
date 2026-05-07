@@ -13,6 +13,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const adminUsername = process.env.ADMIN_USERNAME || "admin"
         const adminPassword = process.env.ADMIN_PASSWORD || "secquest2026"
 
+        // Admin login
         if (
           credentials?.username === adminUsername &&
           credentials?.password === adminPassword
@@ -21,6 +22,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: "1",
             name: "SecQuest Admin",
             email: "admin@secquest.ai",
+          }
+        }
+
+        // Guest login — read-only demo access
+        if (credentials?.username === "guest" && credentials?.password === "guest") {
+          return {
+            id: "2",
+            name: "Guest",
+            email: "guest@secquest.ai",
           }
         }
 
