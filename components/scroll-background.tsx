@@ -10,12 +10,60 @@ export function ScrollBackground() {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext("2d", { alpha: false })
     if (!ctx) return
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+
+    // Offscreen canvas holds the static layer (base + grid). We only repaint
+    // the cheap, animated orb layer on top of it each frame.
+    const staticCanvas = document.createElement("canvas")
+    const staticCtx = staticCanvas.getContext("2d", { alpha: false })!
+
+    let cssWidth = 0
+    let cssHeight = 0
+
+    const paintStatic = () => {
+      const w = cssWidth
+      const h = cssHeight
+
+      staticCanvas.width = Math.floor(w * dpr)
+      staticCanvas.height = Math.floor(h * dpr)
+      staticCanvas.style.width = `${w}px`
+      staticCanvas.style.height = `${h}px`
+      staticCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      // Base dark background
+      staticCtx.fillStyle = "hsl(222, 47%, 4%)"
+      staticCtx.fillRect(0, 0, w, h)
+
+      // Subtle grid lines — drawn once, then cached.
+      staticCtx.strokeStyle = "rgba(0, 212, 255, 0.05)"
+      staticCtx.lineWidth = 1
+      const gridSize = 60
+
+      // Snap to 0.5 px so 1 px lines render crisply (otherwise they shimmer).
+      staticCtx.beginPath()
+      for (let x = 0.5; x < w; x += gridSize) {
+        staticCtx.moveTo(x, 0)
+        staticCtx.lineTo(x, h)
+      }
+      for (let y = 0.5; y < h; y += gridSize) {
+        staticCtx.moveTo(0, y)
+        staticCtx.lineTo(w, y)
+      }
+      staticCtx.stroke()
+    }
+
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      cssWidth = window.innerWidth
+      cssHeight = window.innerHeight
+      canvas.width = Math.floor(cssWidth * dpr)
+      canvas.height = Math.floor(cssHeight * dpr)
+      canvas.style.width = `${cssWidth}px`
+      canvas.style.height = `${cssHeight}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      paintStatic()
     }
     resize()
     window.addEventListener("resize", resize)
@@ -25,63 +73,50 @@ export function ScrollBackground() {
     }
     window.addEventListener("scroll", onScroll, { passive: true })
 
-    // Orb definitions (relative positions + colors)
     const orbs = [
-      { x: 0.15, y: 0.2, r: 350, color: "rgba(0, 212, 255, 0.07)", speedX: 0.00012, speedY: 0.00008 },
-      { x: 0.85, y: 0.6, r: 280, color: "rgba(0, 180, 220, 0.05)", speedX: -0.0001, speedY: 0.00006 },
-      { x: 0.5,  y: 0.9, r: 400, color: "rgba(0, 140, 200, 0.04)", speedX: 0.00006, speedY: -0.0001 },
+      { x: 0.15, y: 0.2, r: 350, color: "rgba(0, 212, 255, 0.07)", speedX: 0.12, speedY: 0.08 },
+      { x: 0.85, y: 0.6, r: 280, color: "rgba(0, 180, 220, 0.05)", speedX: -0.10, speedY: 0.06 },
+      { x: 0.5,  y: 0.9, r: 400, color: "rgba(0, 140, 200, 0.04)", speedX: 0.06, speedY: -0.10 },
     ]
 
-    let time = 0
+    let lastTime = performance.now()
+    let elapsed = 0
+    // Smoothed scroll value — eases toward the latest scrollY so per-frame
+    // deltas are tiny and visually continuous instead of jumping.
+    let smoothedScroll = window.scrollY
 
-    const draw = () => {
-      const w = canvas.width
-      const h = canvas.height
-      const scroll = scrollY.current
+    const draw = (now: number) => {
+      const dt = Math.min(now - lastTime, 50) // clamp tab-switch spikes
+      lastTime = now
+      elapsed += dt / 1000 // seconds
 
-      ctx.clearRect(0, 0, w, h)
+      smoothedScroll += (scrollY.current - smoothedScroll) * 0.1
 
-      // Base dark background
-      ctx.fillStyle = "hsl(222, 47%, 4%)"
-      ctx.fillRect(0, 0, w, h)
+      const w = cssWidth
+      const h = cssHeight
 
-      // Subtle grid lines
-      ctx.strokeStyle = "rgba(0, 212, 255, 0.03)"
-      ctx.lineWidth = 1
-      const gridSize = 60
-      for (let x = 0; x < w; x += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, h)
-        ctx.stroke()
-      }
-      for (let y = 0; y < h; y += gridSize) {
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(w, y)
-        ctx.stroke()
-      }
+      // Blit cached static layer (base + grid) — single, cheap drawImage.
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.drawImage(staticCanvas, 0, 0)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-      // Animated gradient orbs
-      orbs.forEach((orb) => {
-        const cx = (orb.x + Math.sin(time * orb.speedX * 1000) * 0.08) * w
-        const cy = (orb.y + Math.cos(time * orb.speedY * 1000) * 0.06) * h - scroll * 0.15
+      // Animated gradient orbs only.
+      for (const orb of orbs) {
+        const cx = (orb.x + Math.sin(elapsed * orb.speedX) * 0.08) * w
+        const cy = (orb.y + Math.cos(elapsed * orb.speedY) * 0.06) * h - smoothedScroll * 0.15
 
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, orb.r)
         grad.addColorStop(0, orb.color)
         grad.addColorStop(1, "transparent")
 
-        ctx.beginPath()
-        ctx.arc(cx, cy, orb.r, 0, Math.PI * 2)
         ctx.fillStyle = grad
-        ctx.fill()
-      })
+        ctx.fillRect(cx - orb.r, cy - orb.r, orb.r * 2, orb.r * 2)
+      }
 
-      time += 16
       animFrame.current = requestAnimationFrame(draw)
     }
 
-    draw()
+    animFrame.current = requestAnimationFrame(draw)
 
     return () => {
       cancelAnimationFrame(animFrame.current)
