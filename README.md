@@ -66,5 +66,4 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 
 This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
 
----
-*This project was initially bootstrapped with [v0](https://v0.app).*
+--
