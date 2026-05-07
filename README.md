@@ -1,4 +1,4 @@
-# SecQuest AI Site 🛡️🤖
+# SecQuest AI 🛡️🤖
 
 Welcome to the **SecQuest AI Site** repository! This is a modern, high-performance web application built to integrate AI capabilities with security-focused features.
 
