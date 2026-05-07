@@ -1,36 +1,70 @@
-# secquest-ai-site
+# SecQuest AI Site 🛡️🤖
 
+Welcome to the **SecQuest AI Site** repository! This is a modern, high-performance web application built to integrate AI capabilities with security-focused features.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+## 🚀 Tech Stack
 
-## Built with v0
+This project is built using cutting-edge web technologies:
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- **Framework:** [Next.js](https://nextjs.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** CSS / Tailwind CSS (via [v0](https://v0.app))
+- **Deployment:** Vercel (Recommended)
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_z2JZJPKUpYC209ECPjWAUCDOxTVA)
+## ✨ Features
 
-## Getting Started
+*   **AI-Powered Insights:** *(Add details about what AI features are integrated)*
+*   **Security First:** *(Add details about the security aspect of the quest/site)*
+*   **Responsive Design:** Fully responsive UI built for desktop and mobile.
+*   **Modern UX/UI:** Bootstrapped and designed with [v0](https://v0.app).
 
-First, run the development server:
+## 🛠️ Getting Started
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+### Prerequisites
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ensure you have [Node.js](https://nodejs.org/) installed on your machine.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-## Learn More
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/botted1/secquest-ai-site.git
+   cd secquest-ai-site
+   ```
 
-To learn more, take a look at the following resources:
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   ```
 
-<a href="https://v0.app/chat/api/kiro/clone/botted1/secquest-ai-site" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 📁 Project Structure
+
+- `/app` - Contains the main Next.js App Router pages and layouts (`page.tsx`).
+- `/components` - Reusable UI components.
+- `/public` - Static assets like images and icons.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/botted1/secquest-ai-site/issues).
+
+## 📝 License
+
+This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+
+---
+*This project was initially bootstrapped with [v0](https://v0.app).*
